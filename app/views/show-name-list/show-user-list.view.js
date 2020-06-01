@@ -16,6 +16,7 @@ import PickerContainer from '../../components/picker-container/picker-container.
 import styles from './show-user-list.style';
 import constants from '../../extras/constants';
 import LoadingIndicatorComponent from '../../components/loading-indicator/loading-indicator.component';
+import Nodata from '../../components/no-data/no-data.component';
 
 //instantiate
 const db = new SQLiteDatabase();
@@ -54,6 +55,7 @@ export default class ShowUserList extends Component {
 
     db.getFilteredUsers(country, mobile_brand)
       .then(data => {
+        console.log('data', data);
         this.setState({
           isLoading: false,
           user_list: data,
@@ -123,6 +125,43 @@ export default class ShowUserList extends Component {
   showFilterAlert = () => {
     this.setState({modalVisibility: true});
   };
+  _returnView = () => {
+    var view = [];
+    if (this.state.isLoading) {
+      view.push(<LoadingIndicatorComponent loading={this.state.isLoading} />);
+    } else if (this.state.user_list.length == 0) {
+      view.push(<Nodata />);
+    } else {
+      view.push(
+        <FlatList
+          data={this.state.user_list}
+          renderItem={({item}) => (
+            <Card>
+              <CardItem>
+                <TouchableOpacity
+                  onPress={() => this.onPressShowOptions(item.id)}>
+                  <View>
+                    <UserlistComponent title="Name" value={item.name} />
+                    <UserlistComponent title="Country" value={item.country} />
+                    <UserlistComponent
+                      title="Mobile"
+                      value={item.mobile_number}
+                    />
+                    <UserlistComponent
+                      title="Mobile Brand"
+                      value={item.fav_mobile_brand}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </CardItem>
+            </Card>
+          )}
+          keyExtractor={item => item.id}
+        />,
+      );
+    }
+    return view;
+  };
 
   render() {
     const {modalView, openButton, textStyle, centeredView} = styles;
@@ -135,76 +174,49 @@ export default class ShowUserList extends Component {
           rightIconName="filter"
         />
         <Content>
-          {this.state.isLoading && (
-            <LoadingIndicatorComponent loading={this.state.isLoading} />
-          )}
-          <FlatList
-            data={this.state.user_list}
-            renderItem={({item}) => (
-              <Card>
-                <CardItem>
+          {this._returnView()}
+          {this.state.modalVisibility && (
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={this.state.modalVisible}
+              onRequestClose={() => {
+                Alert.alert('Modal has been closed.');
+              }}>
+              <View style={centeredView}>
+                <View style={modalView}>
+                  <PickerContainer
+                    title="Country"
+                    placeholderVal="Nepal"
+                    onValueChangeFunction={this.onCountryChange}
+                    selectedVal={this.state.country}
+                    pickerData={constants.COUNTRY_ARRAY}
+                  />
+                  <PickerContainer
+                    title="Mobile Brand"
+                    placeholderVal="Samsung"
+                    onValueChangeFunction={this.onMobileBrandChange}
+                    selectedVal={this.state.mobile_brand}
+                    pickerData={constants.MOBILE_BRAND_ARRAY}
+                  />
                   <TouchableOpacity
-                    onPress={() => this.onPressShowOptions(item.id)}>
-                    <View>
-                      <UserlistComponent title="Name" value={item.name} />
-                      <UserlistComponent title="Country" value={item.country} />
-                      <UserlistComponent
-                        title="Mobile"
-                        value={item.mobile_number}
-                      />
-                      <UserlistComponent
-                        title="Mobile Brand"
-                        value={item.fav_mobile_brand}
-                      />
-                    </View>
+                    style={{openButton, backgroundColor: '#2196F3'}}
+                    onPress={this.getFilteredUsersList}>
+                    <Text style={textStyle}>Search</Text>
                   </TouchableOpacity>
-                </CardItem>
-              </Card>
-            )}
-            keyExtractor={item => item.id}
-          />
-        </Content>
-        {this.state.modalVisibility && (
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={this.state.modalVisible}
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
-            <View style={centeredView}>
-              <View style={modalView}>
-                <PickerContainer
-                  title="Country"
-                  placeholderVal="Nepal"
-                  onValueChangeFunction={this.onCountryChange}
-                  selectedVal={this.state.country}
-                  pickerData={constants.COUNTRY_ARRAY}
-                />
-                <PickerContainer
-                  title="Mobile Brand"
-                  placeholderVal="Samsung"
-                  onValueChangeFunction={this.onMobileBrandChange}
-                  selectedVal={this.state.mobile_brand}
-                  pickerData={constants.MOBILE_BRAND_ARRAY}
-                />
-                <TouchableOpacity
-                  style={{openButton, backgroundColor: '#2196F3'}}
-                  onPress={this.getFilteredUsersList}>
-                  <Text style={textStyle}>Search</Text>
-                </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={{openButton, backgroundColor: '#2196F3'}}
-                  onPress={() => {
-                    this.setModalVisible(!this.state.modalVisibility);
-                  }}>
-                  <Text style={textStyle}>Hide Modal</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{openButton, backgroundColor: '#2196F3'}}
+                    onPress={() => {
+                      this.setModalVisible(!this.state.modalVisibility);
+                    }}>
+                    <Text style={textStyle}>Hide Modal</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          </Modal>
-        )}
+            </Modal>
+          )}
+        </Content>
       </Container>
     );
   }
