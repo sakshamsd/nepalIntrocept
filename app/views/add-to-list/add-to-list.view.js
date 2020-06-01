@@ -23,9 +23,7 @@ export default class AddToList extends Component {
       isLoading: false,
     };
   }
-  // componentDidMount(){
-  //   db.initDB();
-  // }
+
   addUser() {
     this.setState({
       isLoading: true,
@@ -46,8 +44,7 @@ export default class AddToList extends Component {
           country: '0',
           mobile_brand: '0',
         });
-        // this.props.navigation.state.params.onNavigateBack;
-        // this.props.navigation.goBack();
+
         Alert.alert('Success', 'The user details has been added');
       })
       .catch(err => {

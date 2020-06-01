@@ -138,7 +138,6 @@ export default class SQLiteDatabase {
       query =
         'SELECT id, name, country, mobile_number, fav_mobile_brand FROM UserDataList';
     }
-    console.log('query->',query, dataArray);
     return new Promise(resolve => {
       const user_list = [];
       this.initDB()
