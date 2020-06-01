@@ -1,0 +1,26 @@
+export default {
+  COUNTRY_ARRAY: [
+    'Nepal',
+    'India',
+    'China',
+    'USA',
+    'UK',
+    'Spain',
+    'Germany',
+    'Portugal',
+    'Greece',
+    'Maldives',
+    'Others',
+  ],
+  MOBILE_BRAND_ARRAY: [
+    'iPhone',
+    'Pixel',
+    'Samsung',
+    'One Plus',
+    'Xiaomi',
+    'ASUS',
+    'LG',
+    'Nokia',
+    'Others',
+  ],
+};
